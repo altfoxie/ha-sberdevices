@@ -22,9 +22,6 @@ class SberAPI:
             token=token,
         )
 
-    def token(self) -> dict[str, any]:
-        return self._oauth_client.token
-
     def create_authorization_url(self) -> str:
         return self._oauth_client.create_authorization_url(
             AUTH_ENDPOINT,
@@ -130,10 +127,10 @@ class DeviceAPI:
         await self._home.update_devices_cache()
 
     def get_state(self, key: str) -> dict[str, any]:
-        return find_from_dict(self.device["desired_state"], key)
+        return find_from_list(self.device["desired_state"], key)
 
     def get_attribute(self, key: str) -> dict[str, any]:
-        return find_from_dict(self.device["attributes"], key)
+        return find_from_list(self.device["attributes"], key)
 
     async def set_states(self, states: [dict[str, any]]) -> None:
         await self._home.set_device_state(self._id, states)
@@ -151,12 +148,12 @@ class DeviceAPI:
         await self.set_state_bool("on_off", state)
 
 
-def find_from_dict(data: dict[str, any], key: str) -> dict[str, any]:
+def find_from_list(data: [dict[str, any]], key: str) -> dict[str, any] | None:
     for item in data:
         if item["key"] == key:
             return item
     return None
 
 
-def does_exist_in_dict(data: dict[str, any], key: str) -> bool:
-    return find_from_dict(data, key) is not None
+def does_exist_in_list(data: [dict[str, any]], key: str) -> bool:
+    return find_from_list(data, key) is not None
