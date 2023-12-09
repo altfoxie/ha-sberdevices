@@ -1,5 +1,8 @@
 {
   "config": {
+    "user": {
+      "title": "Wait 10 seconds..."
+    },
     "step": {
       "finish": {
         "title": "Authorization",

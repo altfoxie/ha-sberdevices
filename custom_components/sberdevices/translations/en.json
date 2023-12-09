@@ -9,6 +9,9 @@
             "unknown": "Unexpected error"
         },
         "step": {
+            "user": {
+                "title": "Wait 10 seconds..."
+            },
             "finish": {
                 "data": {
                     "url": "URL"

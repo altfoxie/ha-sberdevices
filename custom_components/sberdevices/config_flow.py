@@ -29,15 +29,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     _client = SberAPI()
 
     # жесть кринж я правда не знаю как лучше
-    async def xdlmao(self, flow_id):
-        i = 10
-        while i > 0:
-            i -= 1
-            await asyncio.sleep(1)
-            await self.hass.config_entries.flow.async_configure(
-                flow_id=flow_id,
-                user_input={},
-            )
+    async def complete_external(self):
+        await asyncio.sleep(10)
+        await self.hass.config_entries.flow.async_configure(
+            flow_id=self.flow_id, user_input={"test": 1}
+        )
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -45,7 +41,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle the initial step."""
 
         if not user_input:
-            self.hass.async_create_task(self.xdlmao(self.flow_id))
+            self.hass.async_create_task(self.complete_external())
             return self.async_external_step(
                 step_id="user", url=self._client.create_authorization_url()
             )
