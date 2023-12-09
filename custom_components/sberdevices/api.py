@@ -55,7 +55,7 @@ class HomeAPI:
         self._client = AsyncClient(
             base_url="https://gateway.iot.sberdevices.ru/gateway/v1",
         )
-        self._token_alive = False  # TODO: check token expiration
+        self._token_alive = False
         self._devices = {}
 
     async def update_token(self) -> None:
@@ -66,11 +66,26 @@ class HomeAPI:
         if token is not None:
             self._client.headers.update({"X-AUTH-jwt": token})
 
-    async def get_devices(self) -> list[dict[str, any]]:
+    async def request(
+        self, method: str, url: str, retry: bool = True, **kwargs
+    ) -> dict[str, any]:
         await self.update_token()
-        return (await self._client.get("/device_groups/tree")).json()["result"][
-            "devices"
-        ]
+
+        res = await self._client.request(method, url, **kwargs)
+        obj = res.json()
+        if res.status_code != 200:
+            code = obj["code"]
+            # dead token xd
+            if code == 16:
+                self._token_alive = False
+                if retry:
+                    return await self.request(method, url, retry=False, **kwargs)
+
+            raise Exception(f"{code} ({res.status_code}): {obj['message']}")
+        return obj
+
+    async def get_devices(self) -> list[dict[str, any]]:
+        return (await self.request("GET", "/device_groups/tree"))["result"]["devices"]
 
     # Cache
     async def update_devices_cache(self) -> list[dict[str, any]]:
@@ -83,8 +98,8 @@ class HomeAPI:
         return self._devices[device_id]
 
     async def set_device_state(self, device_id: str, state: [dict[str, any]]) -> None:
-        await self.update_token()
-        res = await self._client.put(
+        await self._client.request(
+            "PUT",
             f"/devices/{device_id}/state",
             json={
                 "device_id": device_id,
@@ -93,14 +108,12 @@ class HomeAPI:
                 + "Z",  # 2023-12-01T17:00:35.537Z
             },
         )
-        if res.status_code != 200:
-            raise Exception(f"{res.status_code}: {res.text}")
 
         # Merge
-        for s in state:
+        for state_val in state:
             for attribute in self._devices[device_id]["desired_state"]:
-                if attribute["key"] == s["key"]:
-                    attribute.update(s)
+                if attribute["key"] == state_val["key"]:
+                    attribute.update(state_val)
                     break
 
 

@@ -3,3 +3,8 @@ __pycache__
 .tox
 .pre-commit-config.yaml
 .DS_Store
+
+/bin
+/lib
+/include
+/pyvenv.cfg
