@@ -1,5 +1,6 @@
 """Config flow for SberDevices integration."""
 from __future__ import annotations
+import asyncio
 
 import logging
 from typing import Any
@@ -27,18 +28,24 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
     _client = SberAPI()
 
+    # жесть кринж я правда не знаю как лучше
+    async def xdlmao(self, flow_id):
+        i = 10
+        while i > 0:
+            i -= 1
+            await asyncio.sleep(1)
+            await self.hass.config_entries.flow.async_configure(
+                flow_id=flow_id,
+                user_input={},
+            )
+
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle the initial step."""
 
         if not user_input:
-            self.hass.async_create_task(
-                self.hass.config_entries.flow.async_configure(
-                    flow_id=self.flow_id, user_input={"test": 1}
-                )
-            )
-
+            self.hass.async_create_task(self.xdlmao(self.flow_id))
             return self.async_external_step(
                 step_id="user", url=self._client.create_authorization_url()
             )
