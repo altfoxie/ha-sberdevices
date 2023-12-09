@@ -56,6 +56,7 @@ class SberLightEntity(LightEntity):
 
     async def async_update(self):
         await self._api.update()
+        self._hs_color = None
 
     @property
     def unique_id(self) -> str:
