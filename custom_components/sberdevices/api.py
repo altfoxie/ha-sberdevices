@@ -163,7 +163,7 @@ def does_exist_in_list(data: [dict[str, any]], key: str) -> bool:
     return find_from_list(data, key) is not None
 
 def extract_devices(d: dict[str, any]) -> list[dict[str, any]]:
-    devices: list[dict[str, any]] = {device["id"]: device for device in d)}
+    devices: list[dict[str, any]] = {device["id"]: device for device in d["devices"])}
     for children in d["children"]:
         devices.extend(extract_devices(children))
     return devices
