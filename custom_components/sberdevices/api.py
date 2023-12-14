@@ -22,6 +22,10 @@ class SberAPI:
             token=token,
         )
 
+    @property
+    def token(self) -> dict[str, any]:
+        return self._oauth_client.token
+
     def create_authorization_url(self) -> str:
         return self._oauth_client.create_authorization_url(
             AUTH_ENDPOINT,

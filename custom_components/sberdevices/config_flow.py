@@ -57,7 +57,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if not result:
                 errors["base"] = "invalid_auth"
             return self.async_create_entry(
-                title="SberDevices", data={"token": self._client.token()}
+                title="SberDevices", data={"token": self._client.token}
             )
 
         return self.async_show_form(
