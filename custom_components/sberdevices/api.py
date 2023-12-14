@@ -85,7 +85,7 @@ class HomeAPI:
             raise Exception(f"{code} ({res.status_code}): {obj['message']}")
         return obj
 
-    async def get_device_tree(self) -> list[dict[str, any]]:
+    async def get_device_tree(self) -> dict[str, any]:
         return (await self.request("GET", "/device_groups/tree"))["result"]
 
     # Cache
@@ -162,8 +162,8 @@ def find_from_list(data: [dict[str, any]], key: str) -> dict[str, any] | None:
 def does_exist_in_list(data: [dict[str, any]], key: str) -> bool:
     return find_from_list(data, key) is not None
 
-def extract_devices(d: dict[str, any]) -> list[dict[str, any]]:
-    devices: list[dict[str, any]] = {device["id"]: device for device in d["devices"]}
+def extract_devices(d: dict[str, any]) -> dict[str, any]:
+    devices: dict[str, any] = {device["id"]: device for device in d["devices"]}
     for children in d["children"]:
-        devices.extend(extract_devices(children))
+        devices.update(extract_devices(children))
     return devices
