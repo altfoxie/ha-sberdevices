@@ -275,7 +275,7 @@ class SberLightEntity(LightEntity):
 
         if ATTR_COLOR_TEMP_KELVIN in kwargs:
             t = scale_ranged_value_to_int_range(
-                COLOR_TEMP_RANGE,
+                self._real_color_temp_range,
                 self.color_temp_range,
                 kwargs[ATTR_COLOR_TEMP_KELVIN],
             )
