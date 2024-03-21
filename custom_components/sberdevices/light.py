@@ -41,7 +41,7 @@ async def async_setup_entry(
     await home.update_devices_cache()
     async_add_entities(
         [
-            SberLightEntity(DeviceAPI(home, device["id"], "ledstrip" if "ledstrip" in device["image_set_type"] else "bulb"))
+            SberLightEntity(DeviceAPI(home, device["id"]), "ledstrip" if "ledstrip" in device["image_set_type"] else "bulb")
             for device in home.get_cached_devices().values()
             if "bulb" in device["image_set_type"] or "ledstrip" in device["image_set_type"]  # TODO: lutiy kostyl'
         ]
