@@ -22,9 +22,13 @@ from .api import DeviceAPI, HomeAPI
 from .const import DOMAIN
 
 # hardcode xd
-COLOR_TEMP_MIN = 2700
-COLOR_TEMP_MAX = 6500
-COLOR_TEMP_RANGE = (COLOR_TEMP_MIN, COLOR_TEMP_MAX)
+def get_color_temp_range(device_type: str) -> (int, int):
+    match device_type:
+        case "bulb": # Sber A60 bulb
+            return (2700, 6500)
+        case "ledstrip": # SBDV-00033 led strip
+            return (2000, 6500)
+    return (2700, 6500)
 
 H_RANGE = (0, 360)
 S_RANGE = (0, 100)
@@ -37,18 +41,19 @@ async def async_setup_entry(
     await home.update_devices_cache()
     async_add_entities(
         [
-            SberLightEntity(DeviceAPI(home, device["id"]))
+            SberLightEntity(DeviceAPI(home, device["id"], "ledstrip" if "ledstrip" in device["image_set_type"] else "bulb"))
             for device in home.get_cached_devices().values()
-            if "bulb" in device["image_set_type"]  # TODO: lutiy kostyl'
+            if "bulb" in device["image_set_type"] or "ledstrip" in device["image_set_type"]  # TODO: lutiy kostyl'
         ]
     )
 
 
 class SberLightEntity(LightEntity):
-    def __init__(self, api: DeviceAPI) -> None:
+    def __init__(self, api: DeviceAPI, device_type: str) -> None:
         self._id = api.device["id"]
         self._api = api
         self._hs_color: tuple[float, float] | None = None
+        self._real_color_temp_range = get_color_temp_range(device_type)
 
     @property
     def should_poll(self) -> bool:
@@ -130,11 +135,11 @@ class SberLightEntity(LightEntity):
 
     @property
     def min_color_temp_kelvin(self) -> int:
-        return COLOR_TEMP_MIN
+        return self._real_color_temp_range[0]
 
     @property
     def max_color_temp_kelvin(self) -> int:
-        return COLOR_TEMP_MAX
+        return self._real_color_temp_range[1]
 
     @property
     def color_temp_range(self) -> tuple[int, int]:
@@ -153,7 +158,7 @@ class SberLightEntity(LightEntity):
 
         colour_temp = int(self._api.get_state("light_colour_temp")["integer_value"])
         return scale_ranged_value_to_int_range(
-            self.color_temp_range, COLOR_TEMP_RANGE, colour_temp
+            self.color_temp_range, self._real_color_temp_range, colour_temp
         )
 
     @property
