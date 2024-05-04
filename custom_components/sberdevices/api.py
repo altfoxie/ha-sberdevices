@@ -46,7 +46,7 @@ class SberAPI:
 
     async def fetch_home_token(self) -> str:
         return (
-            await self._oauth_client.get("https://mp.aihome.dev/v11/smarthome/token")
+            await self._oauth_client.get("https://companion.devices.sberbank.ru/v13/smarthome/token")
         ).json()["token"]
 
 
