@@ -3,7 +3,7 @@ import tempfile
 
 from authlib.common.security import generate_token
 from authlib.integrations.httpx_client import AsyncOAuth2Client
-from httpx import AsyncClient
+from httpx import AsyncClient, create_ssl_context
 
 AUTH_ENDPOINT = "https://online.sberbank.ru/CSAFront/oidc/authorize.do"
 TOKEN_ENDPOINT = "https://online.sberbank.ru/CSAFront/api/service/oidc/v3/token"
@@ -45,7 +45,7 @@ EYVMxjh8zNbFuoc7fzvvrFILLe7ifvEIUqSVIC/AzplM/Jxw7buXFeGP1qVCBEHq
 with tempfile.NamedTemporaryFile(delete_on_close=False) as temp:
     temp.write(ROOT_CA)
     temp.close()
-    context = httpx.create_ssl_context(verify=temp.name)
+    context = create_ssl_context(verify=temp.name)
 
 
 class SberAPI:
