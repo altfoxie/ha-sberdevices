@@ -5,6 +5,7 @@
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/altfoxie/ha-sberdevices",
+  "issue_tracker": "https://github.com/altfoxie/ha-sberdevices/issues",
   "homekit": {},
   "iot_class": "cloud_polling",
   "requirements": ["Authlib==1.2.1"],
