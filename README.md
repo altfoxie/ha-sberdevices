@@ -1,5 +1,5 @@
 # SberDevices for Home Assistant
-Интеграция умных ламп (пока что?) от SberDevices в Home Assistant.  
+Интеграция умных ламп и лент от SberDevices в Home Assistant.  
 Написано очень плохо, для личных нужд, предоставлено как есть.
 
 ## Установка
