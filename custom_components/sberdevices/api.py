@@ -6,7 +6,7 @@ from authlib.integrations.httpx_client import AsyncOAuth2Client
 from httpx import AsyncClient, create_ssl_context
 
 AUTH_ENDPOINT = "https://online.sberbank.ru/CSAFront/oidc/authorize.do"
-TOKEN_ENDPOINT = "https://online.sberbank.ru/CSAFront/api/service/oidc/v3/token"
+TOKEN_ENDPOINT = "https://online.sberbank.ru:4431/CSAFront/api/service/oidc/v3/token"
 # min_cifra_root_ca.cer
 ROOT_CA = """-----BEGIN CERTIFICATE-----
 MIIFwjCCA6qgAwIBAgICEAAwDQYJKoZIhvcNAQELBQAwcDELMAkGA1UEBhMCUlUx
@@ -87,7 +87,9 @@ class SberAPI:
 
     async def fetch_home_token(self) -> str:
         return (
-            await self._oauth_client.get("https://companion.devices.sberbank.ru/v13/smarthome/token")
+            await self._oauth_client.get("https://companion.devices.sberbank.ru/v13/smarthome/token", headers={
+                "User-Agent": "Salute+prod%2F24.04.1.15123+%28Android+33%3B+Google+sdk_gphone64_arm64%29"
+            })
         ).json()["token"]
 
 
