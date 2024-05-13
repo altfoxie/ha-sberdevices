@@ -21,27 +21,31 @@ from homeassistant.util.scaling import scale_ranged_value_to_int_range
 from .api import DeviceAPI, HomeAPI
 from .const import DOMAIN
 
+
 # hardcode xd
 def get_color_temp_range(device_type: str) -> (int, int):
     match device_type:
-        case "bulb": # Sber A60 bulb
-            return (2700, 6500)
-        case "ledstrip": # SBDV-00033 led strip
-            return (2000, 6500)
-    return (2700, 6500)
+        case "ledstrip":  # SBDV-00033 led strip
+            return 2000, 6500
+        case "bulb":  # Sber A60 bulb
+            return 2700, 6500
+        case _:
+            return 2700, 6500
+
 
 H_RANGE = (0, 360)
 S_RANGE = (0, 100)
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+        hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     home: HomeAPI = hass.data[DOMAIN][entry.entry_id]["home"]
     await home.update_devices_cache()
     async_add_entities(
         [
-            SberLightEntity(DeviceAPI(home, device["id"]), "ledstrip" if "ledstrip" in device["image_set_type"] else "bulb")
+            SberLightEntity(DeviceAPI(home, device["id"]),
+                            "ledstrip" if "ledstrip" in device["image_set_type"] else "bulb")
             for device in home.get_cached_devices().values()
             if "bulb" in device["image_set_type"] or "ledstrip" in device["image_set_type"]  # TODO: lutiy kostyl'
         ]
@@ -88,28 +92,29 @@ class SberLightEntity(LightEntity):
 
     @property
     def supported_color_modes(self) -> set[ColorMode]:
-        m = {
+        modes = {
             "light_brightness": ColorMode.BRIGHTNESS,
             "light_colour_temp": ColorMode.COLOR_TEMP,
         }
-        v = {m[k] for k in m if self._api.get_attribute(k) is not None}
+        values = {modes[k] for k in modes if self._api.get_attribute(k) is not None}
         light_mode = self._api.get_attribute("light_mode")["enum_values"]["values"]
         if "white" in light_mode:
-            v.add(ColorMode.WHITE)
+            values.add(ColorMode.WHITE)
         if "colour" in light_mode:
-            v.add(ColorMode.HS)
+            values.add(ColorMode.HS)
 
-        return v
+        return values
 
     @property
     def color_mode(self) -> ColorMode:
         mode = self._api.get_state("light_mode")["enum_value"]
-        if mode == "white":
-            return ColorMode.COLOR_TEMP
-        elif mode == "colour":
-            return ColorMode.HS
-        else:
-            return ColorMode.UNKNOWN
+        match mode:
+            case "white":
+                return ColorMode.COLOR_TEMP
+            case "colour":
+                return ColorMode.HS
+            case _:
+                return ColorMode.UNKNOWN
 
     @property
     def brightness_range(self) -> tuple[int, int]:
@@ -152,7 +157,7 @@ class SberLightEntity(LightEntity):
         )
 
     @property
-    def color_temp_kelvin(self) -> int:
+    def color_temp_kelvin(self) -> int | None:
         if ColorMode.COLOR_TEMP not in self.supported_color_modes:
             return None
 
@@ -164,10 +169,13 @@ class SberLightEntity(LightEntity):
     @property
     def color_range(self) -> dict[str, tuple[int, int]]:
         colour_values = self._api.get_attribute("light_colour")["color_values"]
+        h = colour_values["h"]
+        s = colour_values["s"]
+        v = colour_values["v"]
         return {
-            "h": (colour_values["h"]["min"], colour_values["h"]["max"]),
-            "s": (colour_values["s"]["min"], colour_values["s"]["max"]),
-            "v": (colour_values["v"]["min"], colour_values["v"]["max"]),
+            "h": (h["min"], h["max"]),
+            "s": (s["min"], s["max"]),
+            "v": (v["min"], v["max"]),
         }
 
     @property
@@ -256,7 +264,7 @@ class SberLightEntity(LightEntity):
 
         brightness = kwargs.get(ATTR_BRIGHTNESS) or kwargs.get(ATTR_WHITE)
         if (
-            self.color_mode != ColorMode.HS or ATTR_WHITE in kwargs
+                self.color_mode != ColorMode.HS or ATTR_WHITE in kwargs
         ) and brightness is not None:
             states.extend(
                 (
