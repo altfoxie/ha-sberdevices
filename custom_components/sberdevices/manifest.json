@@ -1,15 +1,17 @@
 {
   "domain": "sberdevices",
   "name": "SberDevices",
-  "codeowners": ["@altfoxie"],
-  "config_flow": true,
-  "dependencies": [],
-  "documentation": "https://github.com/altfoxie/ha-sberdevices",
-  "issue_tracker": "https://github.com/altfoxie/ha-sberdevices/issues",
-  "homekit": {},
-  "iot_class": "cloud_polling",
-  "requirements": ["Authlib==1.2.1"],
-  "ssdp": [],
-  "zeroconf": [],
-  "version": "0.0.1"
+	"codeowners": ["@altfoxie"],
+	"config_flow": true,
+	"dependencies": [],
+	"documentation": "https://github.com/altfoxie/ha-sberdevices",
+	"homekit": {},
+	"iot_class": "cloud_polling",
+	"issue_tracker": "https://github.com/altfoxie/ha-sberdevices/issues",
+	"requirements": [
+		"Authlib==1.2.1"
+	],
+	"ssdp": [],
+	"version": "0.0.1",
+	"zeroconf": []
 }
