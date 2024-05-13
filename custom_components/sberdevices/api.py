@@ -1,5 +1,5 @@
-from datetime import datetime
 import tempfile
+from datetime import datetime
 
 from authlib.common.security import generate_token
 from authlib.integrations.httpx_client import AsyncOAuth2Client
@@ -82,7 +82,7 @@ class SberAPI:
                 code_verifier=self._verify_token,
             )
             return token is not None
-        except:
+        except Exception:
             return False
 
     async def fetch_home_token(self) -> str:
@@ -111,7 +111,7 @@ class HomeAPI:
             self._client.headers.update({"X-AUTH-jwt": token})
 
     async def request(
-        self, method: str, url: str, retry: bool = True, **kwargs
+            self, method: str, url: str, retry: bool = True, **kwargs
     ) -> dict[str, any]:
         await self.update_token()
 
@@ -132,7 +132,7 @@ class HomeAPI:
         return (await self.request("GET", "/device_groups/tree"))["result"]
 
     # Cache
-    async def update_devices_cache(self) -> list[dict[str, any]]:
+    async def update_devices_cache(self):
         self._devices = extract_devices(await self.get_device_tree())
 
     def get_cached_devices(self) -> list[dict[str, any]]:
@@ -149,7 +149,7 @@ class HomeAPI:
                 "device_id": device_id,
                 "desired_state": state,
                 "timestamp": datetime.now().isoformat()
-                + "Z",  # 2023-12-01T17:00:35.537Z
+                             + "Z",  # 2023-12-01T17:00:35.537Z
             },
         )
 
@@ -204,6 +204,7 @@ def find_from_list(data: [dict[str, any]], key: str) -> dict[str, any] | None:
 
 def does_exist_in_list(data: [dict[str, any]], key: str) -> bool:
     return find_from_list(data, key) is not None
+
 
 def extract_devices(d: dict[str, any]) -> dict[str, any]:
     devices: dict[str, any] = {device["id"]: device for device in d["devices"]}
