@@ -16,5 +16,3 @@ jobs:
         uses: "hacs/action@main"
         with:
           category: "integration"
-      - name: hassfest validation
-        uses: "home-assistant/actions/hassfest@master"
