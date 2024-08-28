@@ -1,5 +1,5 @@
-import tempfile
 from datetime import datetime
+import tempfile
 
 from authlib.common.security import generate_token
 from authlib.integrations.httpx_client import AsyncOAuth2Client
@@ -8,7 +8,7 @@ from httpx import AsyncClient, create_ssl_context
 AUTH_ENDPOINT = "https://online.sberbank.ru/CSAFront/oidc/authorize.do"
 TOKEN_ENDPOINT = "https://online.sberbank.ru:4431/CSAFront/api/service/oidc/v3/token"
 # min_cifra_root_ca.cer
-ROOT_CA = """-----BEGIN CERTIFICATE-----
+ROOT_CA = b"""-----BEGIN CERTIFICATE-----
 MIIFwjCCA6qgAwIBAgICEAAwDQYJKoZIhvcNAQELBQAwcDELMAkGA1UEBhMCUlUx
 PzA9BgNVBAoMNlRoZSBNaW5pc3RyeSBvZiBEaWdpdGFsIERldmVsb3BtZW50IGFu
 ZCBDb21tdW5pY2F0aW9uczEgMB4GA1UEAwwXUnVzc2lhbiBUcnVzdGVkIFJvb3Qg
@@ -40,7 +40,7 @@ WN5szTwaPIvhkhO3CO5ErU2rVdUr89wKpNXbBODFKRtgxUT70YpmJ46VVaqdAhOZ
 D9EUUn4YaeLaS8AjSF/h7UkjOibNc4qVDiPP+rkehFWM66PVnP1Msh93tc+taIfC
 EYVMxjh8zNbFuoc7fzvvrFILLe7ifvEIUqSVIC/AzplM/Jxw7buXFeGP1qVCBEHq
 391d/9RAfaZ12zkwFsl+IKwE/OZxW8AHa9i1p4GO0YSNuczzEm4=
------END CERTIFICATE-----""".encode()
+-----END CERTIFICATE-----"""
 
 with tempfile.NamedTemporaryFile(delete_on_close=False) as temp:
     temp.write(ROOT_CA)
@@ -87,9 +87,12 @@ class SberAPI:
 
     async def fetch_home_token(self) -> str:
         return (
-            await self._oauth_client.get("https://companion.devices.sberbank.ru/v13/smarthome/token", headers={
-                "User-Agent": "Salute+prod%2F24.04.1.15123+%28Android+33%3B+Google+sdk_gphone64_arm64%29"
-            })
+            await self._oauth_client.get(
+                "https://companion.devices.sberbank.ru/v13/smarthome/token",
+                headers={
+                    "User-Agent": "Salute+prod%2F24.08.1.15602+%28Android+34%3B+Google+sdk_gphone64_arm64%29"
+                },
+            )
         ).json()["token"]
 
 
@@ -111,7 +114,7 @@ class HomeAPI:
             self._client.headers.update({"X-AUTH-jwt": token})
 
     async def request(
-            self, method: str, url: str, retry: bool = True, **kwargs
+        self, method: str, url: str, retry: bool = True, **kwargs
     ) -> dict[str, any]:
         await self.update_token()
 
@@ -149,7 +152,7 @@ class HomeAPI:
                 "device_id": device_id,
                 "desired_state": state,
                 "timestamp": datetime.now().isoformat()
-                             + "Z",  # 2023-12-01T17:00:35.537Z
+                + "Z",  # 2023-12-01T17:00:35.537Z
             },
         )
 

@@ -1,4 +1,5 @@
 """Support for Abode Security System lights."""
+
 from __future__ import annotations
 
 import math
@@ -38,16 +39,19 @@ S_RANGE = (0, 100)
 
 
 async def async_setup_entry(
-        hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     home: HomeAPI = hass.data[DOMAIN][entry.entry_id]["home"]
     await home.update_devices_cache()
     async_add_entities(
         [
-            SberLightEntity(DeviceAPI(home, device["id"]),
-                            "ledstrip" if "ledstrip" in device["image_set_type"] else "bulb")
+            SberLightEntity(
+                DeviceAPI(home, device["id"]),
+                "ledstrip" if "ledstrip" in device["image_set_type"] else "bulb",
+            )
             for device in home.get_cached_devices().values()
-            if "bulb" in device["image_set_type"] or "ledstrip" in device["image_set_type"]  # TODO: lutiy kostyl'
+            if "bulb" in device["image_set_type"]
+            or "ledstrip" in device["image_set_type"]  # TODO: lutiy kostyl'
         ]
     )
 
@@ -264,7 +268,7 @@ class SberLightEntity(LightEntity):
 
         brightness = kwargs.get(ATTR_BRIGHTNESS) or kwargs.get(ATTR_WHITE)
         if (
-                self.color_mode != ColorMode.HS or ATTR_WHITE in kwargs
+            self.color_mode != ColorMode.HS or ATTR_WHITE in kwargs
         ) and brightness is not None:
             states.extend(
                 (
