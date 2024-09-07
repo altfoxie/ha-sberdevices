@@ -112,6 +112,7 @@ class HomeAPI:
         token = await self._sber.fetch_home_token()
         if token is not None:
             self._client.headers.update({"X-AUTH-jwt": token})
+            self._token_alive = True
 
     async def request(
         self, method: str, url: str, retry: bool = True, **kwargs
