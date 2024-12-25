@@ -133,7 +133,9 @@ class HomeAPI:
         return obj
 
     async def get_device_tree(self) -> dict[str, any]:
-        return (await self.request("GET", "/device_groups/tree"))["result"]
+        a = (await self.request("GET", "/device_groups/tree"))["result"]
+        print(a)
+        return a
 
     # Cache
     async def update_devices_cache(self):
@@ -212,6 +214,6 @@ def does_exist_in_list(data: [dict[str, any]], key: str) -> bool:
 
 def extract_devices(d: dict[str, any]) -> dict[str, any]:
     devices: dict[str, any] = {device["id"]: device for device in d["devices"]}
-    for children in d["children"]:
+    for children in d["children", "dt_socket_sber"]:
         devices.update(extract_devices(children))
     return devices
