@@ -55,7 +55,6 @@ async def async_setup_entry(
         ]
     )
 
-
 class SberLightEntity(LightEntity):
     def __init__(self, api: DeviceAPI, device_type: str) -> None:
         self._id = api.device["id"]

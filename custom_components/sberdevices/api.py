@@ -4,6 +4,7 @@ import tempfile
 from authlib.common.security import generate_token
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from httpx import AsyncClient, create_ssl_context
+import logging
 
 AUTH_ENDPOINT = "https://online.sberbank.ru/CSAFront/oidc/authorize.do"
 TOKEN_ENDPOINT = "https://online.sberbank.ru:4431/CSAFront/api/service/oidc/v3/token"
@@ -133,17 +134,26 @@ class HomeAPI:
         return obj
 
     async def get_device_tree(self) -> dict[str, any]:
-        return (await self.request("GET", "/device_groups/tree"))["result"]
+        a = (await self.request("GET", "/device_groups/tree"))["result"]
+        # print(a)
+        return a
 
     # Cache
     async def update_devices_cache(self):
-        self._devices = extract_devices(await self.get_device_tree())
+        # _LOGGER = logging.getLogger(__name__)
+        # try:
+        #     _LOGGER.info("Fetching device tree from API")
+        device_data = await self.get_device_tree()
+        self._cached_devices = extract_devices(device_data)
+        #     _LOGGER.info("Devices fetched: %s", self._cached_devices)
+        # except Exception as e:
+        #     _LOGGER.error("Failed to update devices cache: %s", e)
 
     def get_cached_devices(self) -> list[dict[str, any]]:
-        return self._devices
+        return self._cached_devices
 
     def get_cached_device(self, device_id: str) -> dict[str, any]:
-        return self._devices[device_id]
+        return self._cached_devices[device_id]
 
     async def set_device_state(self, device_id: str, state: [dict[str, any]]) -> None:
         await self._client.request(
@@ -159,7 +169,7 @@ class HomeAPI:
 
         # Merge
         for state_val in state:
-            for attribute in self._devices[device_id]["desired_state"]:
+            for attribute in self._cached_devices[device_id]["desired_state"]:
                 if attribute["key"] == state_val["key"]:
                     attribute.update(state_val)
                     break
