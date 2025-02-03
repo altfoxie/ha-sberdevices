@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import math
-
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -12,21 +10,6 @@ from homeassistant.util.scaling import scale_ranged_value_to_int_range
 
 from .api import DeviceAPI, HomeAPI
 from .const import DOMAIN
-
-
-# hardcode xd
-def get_color_temp_range(device_type: str) -> (int, int):
-    match device_type:
-        case "ledstrip":  # SBDV-00033 led strip
-            return 2000, 6500
-        case "bulb":  # Sber A60 bulb
-            return 2700, 6500
-        case _:
-            return 2700, 6500
-
-
-H_RANGE = (0, 360)
-S_RANGE = (0, 100)
 
 
 async def async_setup_entry(

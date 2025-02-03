@@ -1,10 +1,10 @@
 from datetime import datetime
 import tempfile
+from typing import List
 
 from authlib.common.security import generate_token
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from httpx import AsyncClient, create_ssl_context
-import logging
 
 AUTH_ENDPOINT = "https://online.sberbank.ru/CSAFront/oidc/authorize.do"
 TOKEN_ENDPOINT = "https://online.sberbank.ru:4431/CSAFront/api/service/oidc/v3/token"
@@ -104,7 +104,7 @@ class HomeAPI:
             base_url="https://gateway.iot.sberdevices.ru/gateway/v1",
         )
         self._token_alive = False
-        self._devices = {}
+        self._cached_devices = {}
 
     async def update_token(self) -> None:
         if self._token_alive:
@@ -140,14 +140,8 @@ class HomeAPI:
 
     # Cache
     async def update_devices_cache(self):
-        # _LOGGER = logging.getLogger(__name__)
-        # try:
-        #     _LOGGER.info("Fetching device tree from API")
         device_data = await self.get_device_tree()
         self._cached_devices = extract_devices(device_data)
-        #     _LOGGER.info("Devices fetched: %s", self._cached_devices)
-        # except Exception as e:
-        #     _LOGGER.error("Failed to update devices cache: %s", e)
 
     def get_cached_devices(self) -> list[dict[str, any]]:
         return self._cached_devices
@@ -155,7 +149,9 @@ class HomeAPI:
     def get_cached_device(self, device_id: str) -> dict[str, any]:
         return self._cached_devices[device_id]
 
-    async def set_device_state(self, device_id: str, state: [dict[str, any]]) -> None:
+    async def set_device_state(
+        self, device_id: str, state: List[dict[str, any]]
+    ) -> None:
         await self._client.request(
             "PUT",
             f"/devices/{device_id}/state",
@@ -193,7 +189,7 @@ class DeviceAPI:
     def get_attribute(self, key: str) -> dict[str, any]:
         return find_from_list(self.device["attributes"], key)
 
-    async def set_states(self, states: [dict[str, any]]) -> None:
+    async def set_states(self, states: List[dict[str, any]]) -> None:
         await self._home.set_device_state(self._id, states)
 
     async def set_state(self, state: dict[str, any]) -> None:
@@ -209,14 +205,14 @@ class DeviceAPI:
         await self.set_state_bool("on_off", state)
 
 
-def find_from_list(data: [dict[str, any]], key: str) -> dict[str, any] | None:
+def find_from_list(data: List[dict[str, any]], key: str) -> dict[str, any] | None:
     for item in data:
         if item["key"] == key:
             return item
     return None
 
 
-def does_exist_in_list(data: [dict[str, any]], key: str) -> bool:
+def does_exist_in_list(data: List[dict[str, any]], key: str) -> bool:
     return find_from_list(data, key) is not None
 
 
