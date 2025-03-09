@@ -66,3 +66,34 @@ class SberSwitchEntity(SwitchEntity):
 
     async def async_turn_off(self, **kwargs) -> None:
         await self._api.set_on_off(False)
+
+    def _get_reported_state_value(self, key: str):
+        if "reported_state" not in self._api.device:
+            return None
+
+        for state in self._api.device["reported_state"]:
+            if state["key"] == key:
+                return state
+        return None
+
+    @property
+    def extra_state_attributes(self):
+        attributes = {}
+
+        attr_names = ['cur_voltage', 'cur_current', 'cur_power']
+
+        for attr_name in attr_names:
+            state = self._get_reported_state_value(attr_name)
+            if not state:
+                continue
+
+            if state["type"] == "FLOAT":
+                attributes[attr_name] = state["float_value"]
+            elif state["type"] == "INTEGER":
+                if attr_name == "cur_current":
+                    # Convert current from mA to A
+                    attributes[attr_name] = float(state["integer_value"]) / 1000
+                else:
+                    attributes[attr_name] = state["integer_value"]
+
+        return attributes
