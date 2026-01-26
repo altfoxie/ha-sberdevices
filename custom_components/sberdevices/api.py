@@ -217,7 +217,7 @@ def does_exist_in_list(data: List[dict[str, any]], key: str) -> bool:
 
 
 def extract_devices(d: dict[str, any]) -> dict[str, any]:
-    devices: dict[str, any] = {device["id"]: device for device in d["devices"]}
+    devices: dict[str, any] = {device["id"]: device | {"group": d["group"]["name"]} for device in d["devices"]}
     for children in d["children"]:
         devices.update(extract_devices(children))
     return devices
