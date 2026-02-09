@@ -8,3 +8,6 @@ __pycache__
 /lib
 /include
 /pyvenv.cfg
+.env.local
+venv/
+.idea

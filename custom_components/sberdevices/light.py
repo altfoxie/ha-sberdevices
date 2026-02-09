@@ -30,6 +30,8 @@ def get_color_temp_range(device_type: str) -> (int, int):
             return 2000, 6500
         case "bulb":  # Sber A60 bulb
             return 2700, 6500
+        case "night_lamp":  # Sber night lamp
+            return 2700, 6500
         case _:
             return 2700, 6500
 
@@ -43,15 +45,15 @@ async def async_setup_entry(
 ) -> None:
     home: HomeAPI = hass.data[DOMAIN][entry.entry_id]["home"]
     await home.update_devices_cache()
+    light_types = ("bulb", "ledstrip", "night_lamp")
     async_add_entities(
         [
             SberLightEntity(
                 DeviceAPI(home, device["id"]),
-                "ledstrip" if "ledstrip" in device["image_set_type"] else "bulb",
+                next(t for t in light_types if t in device["image_set_type"]),
             )
             for device in home.get_cached_devices().values()
-            if "bulb" in device["image_set_type"]
-            or "ledstrip" in device["image_set_type"]  # TODO: lutiy kostyl'
+            if any(t in device["image_set_type"] for t in light_types)
         ]
     )
 
