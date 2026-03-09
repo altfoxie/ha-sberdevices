@@ -20,6 +20,7 @@ from homeassistant.util.color import brightness_to_value, value_to_brightness
 from homeassistant.util.scaling import scale_ranged_value_to_int_range
 
 from .api import DeviceAPI, HomeAPI
+from .entity import SberSensorEntity
 from .const import DOMAIN
 
 
@@ -58,39 +59,16 @@ async def async_setup_entry(
     )
 
 
-class SberLightEntity(LightEntity):
+class SberLightEntity(SberSensorEntity, LightEntity):
     def __init__(self, api: DeviceAPI, device_type: str) -> None:
         self._id = api.device["id"]
         self._api = api
         self._hs_color: tuple[float, float] | None = None
         self._real_color_temp_range = get_color_temp_range(device_type)
 
-    @property
-    def should_poll(self) -> bool:
-        return True
-
     async def async_update(self):
         await self._api.update()
         self._hs_color = None
-
-    @property
-    def unique_id(self) -> str:
-        return self._api.device["id"]
-
-    @property
-    def name(self) -> str:
-        return self._api.device["name"]["name"]
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        return DeviceInfo(
-            identifiers={(DOMAIN, self._api.device["serial_number"])},
-            name=self.name,
-            manufacturer=self._api.device["device_info"]["manufacturer"],
-            model=self._api.device["device_info"]["model"],
-            sw_version=self._api.device["sw_version"],
-            serial_number=self._api.device["serial_number"],
-        )
 
     @property
     def is_on(self) -> bool:

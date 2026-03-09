@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from .api import HomeAPI, SberAPI
 from .const import DOMAIN
 
-PLATFORMS: list[Platform] = [Platform.LIGHT, Platform.SWITCH]
+PLATFORMS: list[Platform] = [Platform.LIGHT, Platform.SWITCH, Platform.SENSOR, Platform.BINARY_SENSOR]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up SberDevices from a config entry."""
