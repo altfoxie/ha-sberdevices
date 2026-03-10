@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+mkdir -p config
+export PYTHONPATH="${PYTHONPATH:-}:${PWD}/custom_components"
+
+uv run hass -c ./config --debug

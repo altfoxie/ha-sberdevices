@@ -1,0 +1,37 @@
+[project]
+name = "ha-sberdevices"
+version = "0.0.0"
+requires-python = ">=3.12"
+
+[dependency-groups]
+dev = ["homeassistant", "authlib==1.2.1", "ruff", "ty", "codespell"]
+test = ["pytest", "pytest-asyncio", "pytest-cov"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["B", "C", "E", "F", "I", "UP", "SIM", "RUF", "W"]
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components", "homeassistant"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*.py" = ["T201"]
+"tests/*" = ["S101"]
+
+[tool.ty.environment]
+python-version = "3.12"
+
+[tool.ty.src]
+include = ["custom_components/sberdevices"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["custom_components/sberdevices"]

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+echo "=== Manifest Deps ==="
+uv run python -c "
+import json, tomllib, sys
+
+manifest = json.load(open('custom_components/sberdevices/manifest.json'))
+pyproject = tomllib.load(open('pyproject.toml', 'rb'))
+
+dev_deps = {d.lower() for d in pyproject['dependency-groups']['dev']}
+ok = True
+
+for req in manifest.get('requirements', []):
+    if req.lower() not in dev_deps:
+        print(f'MISMATCH: {req} in manifest.json but not in pyproject.toml [dependency-groups.dev]')
+        ok = False
+
+if ok:
+    print('OK')
+else:
+    sys.exit(1)
+"
+
+echo "=== Lint ==="
+uv run ruff format --check .
+uv run ruff check .
+
+echo "=== Type Check ==="
+uv run ty check

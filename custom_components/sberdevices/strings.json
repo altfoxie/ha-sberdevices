@@ -2,10 +2,8 @@
   "config": {
     "step": {
       "user": {
-        "title": "Wait 10 seconds..."
-      },
-      "finish": {
         "title": "Authorization",
+        "description": "1. Open the [authorization link]({auth_url})\n2. Sign in\n3. Copy the failed redirect URL (`companionapp://...`) from the browser console (F12)\n4. Paste it below",
         "data": {
           "url": "[%key:common::config_flow::data::url%]"
         },

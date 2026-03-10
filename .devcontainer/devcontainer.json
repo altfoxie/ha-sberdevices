@@ -1,0 +1,28 @@
+{
+  "name": "ha-sberdevices",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "postCreateCommand": "scripts/setup",
+  "containerEnv": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1",
+    "UV_PROJECT_ENVIRONMENT": "/home/vscode/.local/ha-venv"
+  },
+  "forwardPorts": [8123],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "charliermarsh.ruff",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff"
+        }
+      }
+    }
+  }
+}

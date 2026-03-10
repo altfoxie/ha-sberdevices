@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+if ! command -v uv &> /dev/null; then
+  pipx install uv
+fi
+
+uv sync

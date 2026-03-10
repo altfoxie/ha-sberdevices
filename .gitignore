@@ -1,13 +1,29 @@
-*~
-__pycache__
-.tox
-.pre-commit-config.yaml
-.DS_Store
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
 
-/bin
-/lib
-/include
-/pyvenv.cfg
-.env.local
+# Virtual environments
+.venv/
 venv/
-.idea
+pyvenv.cfg
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Home Assistant config (development)
+config/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+*~
+
+# Misc
+.env.local
+.tox

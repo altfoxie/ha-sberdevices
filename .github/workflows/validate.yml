@@ -2,26 +2,43 @@ name: Validate
 
 on:
   push:
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
+      - run: uv pip install --system ruff
+      - run: ruff format --check .
+      - run: ruff check .
+
   validate-hacs:
     name: HACS
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
-      - uses: "actions/checkout@v4"
-      - name: HACS validation
-        uses: "hacs/action@main"
+      - uses: actions/checkout@v4
+      - uses: hacs/action@main
         with:
-          category: "integration"
-  
+          category: integration
+
   validate-hassfest:
-    name: hassfest
-    runs-on: "ubuntu-latest"
+    name: Hassfest
+    runs-on: ubuntu-latest
     steps:
-        - uses: "actions/checkout@v4"
-        - name: hassfest validation
-          uses: "home-assistant/actions/hassfest@master"
+      - uses: actions/checkout@v4
+      - uses: home-assistant/actions/hassfest@master

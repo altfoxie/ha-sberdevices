@@ -7,8 +7,8 @@ Run:
 
 import asyncio
 import json
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -36,17 +36,17 @@ async def main():
     token = sber.token
 
     env_lines = [
-        f'SBER_ACCESS_TOKEN={token["access_token"]}',
-        f'SBER_REFRESH_TOKEN={token.get("refresh_token", "")}',
-        f'SBER_TOKEN_TYPE={token.get("token_type", "Bearer")}',
-        f'SBER_EXPIRES_AT={int(token.get("expires_at", 0))}',
+        f"SBER_ACCESS_TOKEN={token['access_token']}",
+        f"SBER_REFRESH_TOKEN={token.get('refresh_token', '')}",
+        f"SBER_TOKEN_TYPE={token.get('token_type', 'Bearer')}",
+        f"SBER_EXPIRES_AT={int(token.get('expires_at', 0))}",
     ]
 
     env_path = os.path.join(os.path.dirname(__file__), "..", ".env.local")
     with open(env_path, "w") as f:
         f.write("\n".join(env_lines) + "\n")
 
-    print(f"\nУспешно! Токен сохранён в .env.local\n")
+    print("\nУспешно! Токен сохранён в .env.local\n")
     for line in env_lines:
         print(f"  {line}")
     print(f"\nПолный токен (JSON):\n{json.dumps(token, indent=2)}")
