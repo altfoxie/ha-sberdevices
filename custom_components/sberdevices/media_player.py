@@ -14,7 +14,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import DeviceAPI, HomeAPI
-from .const import DOMAIN, MEDIA_PLAYER_TYPES
+from .const import DOMAIN, MEDIA_PLAYER_TYPES, SPEAKER_TYPES
 from .entity import SberEntity
 
 
@@ -26,7 +26,7 @@ async def async_setup_entry(
         [
             SberMediaPlayerEntity(DeviceAPI(home, device["id"]))
             for device in home.get_cached_devices().values()
-            if device.get("image_set_type") in MEDIA_PLAYER_TYPES
+            if device.get("image_set_type") in MEDIA_PLAYER_TYPES + SPEAKER_TYPES
         ]
     )
 
