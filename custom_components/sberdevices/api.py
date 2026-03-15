@@ -124,10 +124,26 @@ class HomeAPI:
     async def get_device_tree(self) -> dict[str, Any]:
         return (await self.request("GET", "/device_groups/tree"))["result"]
 
+    async def get_all_devices(self) -> list[dict[str, Any]]:
+        """Fetch all devices from /devices (includes SberBoom, TV, vacuum, etc.)."""
+        res = await self.request("GET", "/devices")
+        if isinstance(res, list):
+            return res
+        return res.get("result", [])
+
     # Cache
     async def update_devices_cache(self):
+        # Merge devices from both endpoints: tree (IoT) + flat list (all)
         device_data = await self.get_device_tree()
         self._cached_devices = extract_devices(device_data)
+
+        try:
+            all_devices = await self.get_all_devices()
+            for device in all_devices:
+                if device["id"] not in self._cached_devices:
+                    self._cached_devices[device["id"]] = device
+        except Exception:
+            _LOGGER.warning("Failed to fetch /devices, using tree only")
 
     def get_cached_devices(self) -> dict[str, Any]:
         return self._cached_devices

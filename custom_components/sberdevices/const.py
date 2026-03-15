@@ -14,6 +14,9 @@ COMPANION_TOKEN_URL = "https://companion.devices.sberbank.ru/v13/smarthome/token
 # Device types
 LIGHT_TYPES = ("bulb", "ledstrip", "night_lamp")
 SWITCH_TYPES = ("dt_socket_sber",)
+MEDIA_PLAYER_TYPES = ("dt_salute_tv_xl",)
+SPEAKER_TYPES = ("dt_boom_lw", "dt_boom_mini_lw")
+VACUUM_TYPES = ("cat_vacuum_cleaner_m",)
 
 # Color temperature ranges (Kelvin) per device type
 COLOR_TEMP_RANGES: dict[str, tuple[int, int]] = {
