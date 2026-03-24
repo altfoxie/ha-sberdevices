@@ -5,52 +5,48 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .api import DeviceAPI, HomeAPI
-from .const import DOMAIN, SWITCH_TYPES
-from .entity import SberEntity
+from .const import SWITCH_TYPES
+from .core.coordinator import SberDataUpdateCoordinator
+from .core.entity import SberEntity
+from .core.runtime import SberConfigEntry
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
-    home: HomeAPI = hass.data[DOMAIN][entry.entry_id]["home"]
+async def async_setup_entry(
+    hass: HomeAssistant, entry: SberConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
+    runtime_data = entry.runtime_data
     async_add_entities(
         [
-            SberSwitchEntity(DeviceAPI(home, device["id"]))
-            for device in home.get_cached_devices().values()
+            SberSwitchEntity(runtime_data.coordinator, device["id"])
+            for device in runtime_data.coordinator.data.values()
             if any(t in device["image_set_type"] for t in SWITCH_TYPES)
         ]
     )
 
 
 class SberSwitchEntity(SberEntity, SwitchEntity):
-    async def async_update(self) -> None:
-        await super().async_update()
-        self._attr_is_on = self._api.get_state("on_off")["bool_value"]
+    def __init__(self, coordinator: SberDataUpdateCoordinator, device_id: str) -> None:
+        super().__init__(coordinator, device_id)
+        self._update_attrs()
+
+    def _update_attrs(self) -> None:
+        self._attr_is_on = self.get_desired_state("on_off")["bool_value"]
         self._attr_extra_state_attributes = self._compute_extra_attributes()
 
-    async def async_turn_on(self, **kwargs) -> None:
-        await self._api.set_on_off(True)
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        await self.async_set_on_off(True)
 
-    async def async_turn_off(self, **kwargs) -> None:
-        await self._api.set_on_off(False)
-
-    def _get_reported_state_value(self, key: str) -> dict[str, Any] | None:
-        if "reported_state" not in self._api.device:
-            return None
-
-        for state in self._api.device["reported_state"]:
-            if state["key"] == key:
-                return state
-        return None
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        await self.async_set_on_off(False)
 
     def _compute_extra_attributes(self) -> dict[str, Any]:
         attributes: dict[str, Any] = {}
 
         for attr_name in ("cur_voltage", "cur_current", "cur_power"):
-            state = self._get_reported_state_value(attr_name)
+            state = self.get_reported_state(attr_name)
             if not state:
                 continue
 

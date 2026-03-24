@@ -3,4 +3,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-uv run pytest "$@"
+if [ "$#" -eq 0 ]; then
+  set -- tests/test_real_api.py
+fi
+
+uv run --group test pytest "$@"

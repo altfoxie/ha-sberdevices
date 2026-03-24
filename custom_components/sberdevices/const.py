@@ -1,5 +1,7 @@
 """Constants for the SberDevices integration."""
 
+from datetime import timedelta
+
 DOMAIN = "sberdevices"
 
 # OAuth endpoints
@@ -10,6 +12,9 @@ OAUTH_CLIENT_ID = "b1f0f0c6-fcb0-4ece-8374-6b614ebe3d42"
 # API endpoints
 GATEWAY_BASE_URL = "https://gateway.iot.sberdevices.ru/gateway/v1"
 COMPANION_TOKEN_URL = "https://companion.devices.sberbank.ru/v13/smarthome/token"
+
+# Polling
+COORDINATOR_UPDATE_INTERVAL = timedelta(seconds=30)
 
 # Device types
 LIGHT_TYPES = ("bulb", "ledstrip", "night_lamp")
